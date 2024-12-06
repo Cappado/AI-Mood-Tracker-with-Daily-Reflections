@@ -1,0 +1,30 @@
+# mood_tracker.py
+
+from transformers import pipeline
+import matplotlib.pyplot as plt
+
+sentiment_analyzer = pipeline("sentiment-analysis")
+
+def analyze_mood(entry):
+    result = sentiment_analyzer(entry)
+    return result[0]["label"], result[0]["score"]
+
+def log_mood(mood, entry):
+    with open("mood_log.txt", "a") as file:
+        file.write(f"{mood},{entry}\n")
+
+def visualize_mood():
+    moods = {"POSITIVE": 0, "NEGATIVE": 0, "NEUTRAL": 0}
+    with open("mood_log.txt", "r") as file:
+        for line in file:
+            mood = line.split(',')[0]
+            moods[mood] += 1
+    plt.bar(moods.keys(), moods.values())
+    plt.title("Mood Tracker")
+    plt.show()
+
+# Usage
+entry = "I had a productive day but felt a bit stressed in the evening."
+mood, confidence = analyze_mood(entry)
+log_mood(mood, entry)
+visualize_mood()
